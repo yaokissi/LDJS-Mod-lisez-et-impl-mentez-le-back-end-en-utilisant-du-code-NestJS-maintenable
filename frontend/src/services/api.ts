@@ -1,13 +1,13 @@
 import axios from 'axios';
 import type {
-  User,
-  Rental,
   AuthResponse,
-  RegisterRequest,
+  CreateRentalRequest,
   LoginRequest,
   Message,
-  CreateRentalRequest,
-  UpdateRentalRequest
+  RegisterRequest,
+  Rental,
+  UpdateRentalRequest,
+  User,
 } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:3001';
@@ -20,13 +20,27 @@ const api = axios.create({
 });
 
 // Interceptor pour ajouter le token JWT à chaque requête
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+axios.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    return Promise.reject(error);
+  },
+);
 
 // Auth API
 export const authAPI = {
@@ -74,7 +88,10 @@ export const rentalsAPI = {
     return response.data;
   },
 
-  update: async (id: number, data: UpdateRentalRequest): Promise<{ message: string }> => {
+  update: async (
+    id: number,
+    data: UpdateRentalRequest,
+  ): Promise<{ message: string }> => {
     const formData = new FormData();
     if (data.name) formData.append('name', data.name);
     if (data.surface) formData.append('surface', data.surface.toString());
