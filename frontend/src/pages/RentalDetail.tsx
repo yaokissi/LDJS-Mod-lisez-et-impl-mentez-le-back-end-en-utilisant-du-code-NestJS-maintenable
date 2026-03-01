@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { messagesAPI, rentalsAPI, usersAPI } from '../services/api';
+import { messagesAPI, rentalsAPI } from '../services/api';
 
 export default function RentalDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,12 +19,6 @@ export default function RentalDetail() {
     enabled: !!id,
   });
 
-  const { data: owner } = useQuery({
-    queryKey: ['user', rental?.owner_id],
-    queryFn: () => usersAPI.getById(rental!.owner_id),
-    enabled: !!rental?.owner_id,
-  });
-
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rental || !message.trim()) return;
@@ -33,7 +27,7 @@ export default function RentalDetail() {
     try {
       await messagesAPI.send({
         rental_id: rental.id,
-        user_id: rental.owner_id,
+        user_id: rental.owner.id,
         message: message.trim(),
       });
       setMessage('');
@@ -91,9 +85,7 @@ export default function RentalDetail() {
               <h1 className='text-3xl font-bold text-gray-900 mb-2'>
                 {rental.name}
               </h1>
-              <p className='text-gray-600'>
-                Propriétaire: {owner?.name || 'Chargement...'}
-              </p>
+              <p className='text-gray-600'>Propriétaire: {rental.owner.name}</p>
             </div>
             <div className='text-right'>
               <p className='text-3xl font-bold text-primary'>

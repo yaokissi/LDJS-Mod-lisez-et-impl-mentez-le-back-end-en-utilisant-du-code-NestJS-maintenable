@@ -13,7 +13,7 @@ export interface Rental {
   price: number;
   picture: string;
   description: string;
-  owner_id: number;
+  owner: User;
   created_at: string;
   updated_at: string;
 }

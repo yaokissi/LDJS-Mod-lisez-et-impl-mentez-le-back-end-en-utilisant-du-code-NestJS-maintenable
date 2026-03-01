@@ -115,11 +115,3 @@ export const messagesAPI = {
     return response.data;
   },
 };
-
-// Users API
-export const usersAPI = {
-  getById: async (id: number): Promise<User> => {
-    const response = await api.get(`/api/user/${id}`);
-    return response.data;
-  },
-};
