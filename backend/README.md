@@ -96,3 +96,28 @@ Le code est structuré selon les normes recommandées par NestJS :
 * `src/messages` : Envoi de messages aux propriétaires.
 * `uploads/` : Dossier physique servant les images statiques uploadées.
 
+### 🌳 Arborescence du projet
+
+```text
+backend/
+├── prisma/
+│   └── schema.prisma             # Schéma de base de données Prisma
+├── src/
+│   ├── main.ts                   # Point d'entrée de l'application (init Swagger & Express)
+│   ├── app.module.ts             # Module racine important tous les sous-modules
+│   ├── prisma/                   # Connexion globale à la base de données
+│   ├── auth/                     # Authentification (JWT, Guards, Register/Login)
+│   │   ├── dto/                  # Validation des données d'authentification
+│   │   └── guards/               # Garde-barrière JWT
+│   ├── rentals/                  # Gestion des locations (Locations saisonnières)
+│   │   └── dto/                  # Validation des données de création/modification
+│   ├── user/                     # Gestion des profils utilisateurs
+│   └── messages/                 # Gestion des messages
+│       └── dto/                  # Validation des données de message
+├── uploads/                      # Dossier de stockage des images uploadées
+├── Kissi_Yao_2_BDD_072026.txt    # Script SQL de création de la BDD (Livrable)
+├── .env                          # Variables d'environnement (Base de données, JWT)
+└── README.md                     # Ce fichier explicatif
+```
+
+
