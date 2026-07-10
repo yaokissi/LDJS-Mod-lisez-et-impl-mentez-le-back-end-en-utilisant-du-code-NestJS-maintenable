@@ -7,19 +7,19 @@ export class UserService {
 
   /**
    * Récupère un utilisateur par son identifiant.
-   * Exclut le mot de passe pour des raisons évidentes de sécurité.
+   * On exclut le mot de passe pour des raisons évidentes de sécurité.
    */
   async findOne(id: number) {
     const user = await this.prisma.uSERS.findUnique({
       where: { id },
     });
 
-    // Si l'utilisateur n'existe pas en base, lever une erreur 404.
+    // Si l'utilisateur n'existe pas en base, on throw une erreur 404.
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // Exclure le mot de passe de l'objet renvoyé
+    // On exclut le mot de passe de l'objet renvoyé
     const { password, ...result } = user;
     return result;
   }

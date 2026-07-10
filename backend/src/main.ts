@@ -25,7 +25,7 @@ async function bootstrap() {
     }),
   );
 
-  // Activer CORS pour permettre la communication avec le front-end React
+  // Activation de CORS pour permettre la communication avec le front-end React
   app.enableCors();
 
   // Configuration de Swagger
