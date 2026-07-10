@@ -73,7 +73,7 @@ L'API est entièrement documentée à l'aide de Swagger (OpenAPI 3).
 2. Copiez le jeton (`token`) reçu dans la réponse de succès.
 3. Cliquez sur le bouton vert **Authorize** en haut à droite de l'interface Swagger.
 4. Collez votre token dans le champ et validez.
-5. Vous pouvez désormais tester l'ensemble des routes privées (Locations, Messages, etc.) directement depuis Swagger.
+5. Vous pouvez désormais tester l'ensemble des routes privées (Rentals, Messages et User.) directement depuis Swagger.
 
 ---
 
