@@ -6,16 +6,20 @@ import { UpdateRentalDto } from './dto/update-rental.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('rentals')
+@ApiBearerAuth('bearer')
 @Controller('rentals')
 export class RentalsController {
   constructor(private readonly rentalsService: RentalsService) {}
 
   /**
    * Endpoint GET /api/rentals
-   * Protégé par le JwtAuthGuard. Seuls les utilisateurs connectés
-   * avec un token JWT valide peuvent récupérer la liste des locations.
    */
+  @ApiOperation({ summary: 'Récupérer la liste de toutes les locations' })
+  @ApiResponse({ status: 200, description: 'Renvoie un tableau contenant toutes les locations saisonnières.' })
+  @ApiResponse({ status: 401, description: 'Token JWT non valide.' })
   @UseGuards(JwtAuthGuard)
   @Get()
   async getAllRentals() {
@@ -24,8 +28,11 @@ export class RentalsController {
 
   /**
    * Endpoint GET /api/rentals/:id
-   * Protégé par le JwtAuthGuard. Récupère le détail d'un hébergement.
    */
+  @ApiOperation({ summary: 'Récupérer le détail d\'une location spécifique' })
+  @ApiResponse({ status: 200, description: 'Renvoie les données complètes de la location avec le propriétaire.' })
+  @ApiResponse({ status: 401, description: 'Token JWT non valide.' })
+  @ApiResponse({ status: 404, description: 'Location introuvable.' })
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getRentalById(@Param('id', ParseIntPipe) id: number) {
@@ -34,10 +41,12 @@ export class RentalsController {
 
   /**
    * Endpoint POST /api/rentals
-   * Protégé par le JwtAuthGuard.
-   * Permet de créer une location en envoyant des données de type multipart/form-data.
-   * Utilise FileInterceptor pour capturer le fichier "picture" et le sauvegarder dans le dossier "uploads".
    */
+  @ApiOperation({ summary: 'Créer une nouvelle location (avec upload d\'image)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'La location a été créée avec succès.' })
+  @ApiResponse({ status: 400, description: 'Données invalides dans le formulaire.' })
+  @ApiResponse({ status: 401, description: 'Token JWT non valide.' })
   @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
@@ -45,7 +54,6 @@ export class RentalsController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) => {
-          // Générer un nom de fichier unique basé sur le timestamp et un nombre aléatoire
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
         },
@@ -57,10 +65,7 @@ export class RentalsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
-    // Reconstruire l'URL absolue de l'image pour la stocker en base
     const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
-    
-    // Récupérer l'ID de l'utilisateur connecté depuis l'objet request (injecté par Passport)
     const ownerId = req.user.id;
 
     return this.rentalsService.create(createRentalDto, fileUrl, ownerId);
@@ -68,10 +73,13 @@ export class RentalsController {
 
   /**
    * Endpoint PUT /api/rentals/:id
-   * Protégé par le JwtAuthGuard.
-   * Permet de modifier une location. Les données sont envoyées en multipart/form-data.
-   * L'image ("picture") est optionnelle dans cette route.
    */
+  @ApiOperation({ summary: 'Modifier une location existante' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 200, description: 'La location a été mise à jour avec succès.' })
+  @ApiResponse({ status: 400, description: 'Données invalides.' })
+  @ApiResponse({ status: 401, description: 'Token JWT non valide.' })
+  @ApiResponse({ status: 404, description: 'Location introuvable.' })
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(
@@ -91,7 +99,6 @@ export class RentalsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
-    // Si une nouvelle image a été uploadée, on génère sa nouvelle URL absolue
     const fileUrl = file
       ? `${req.protocol}://${req.get('host')}/uploads/${file.filename}`
       : undefined;
@@ -99,6 +106,7 @@ export class RentalsController {
     return this.rentalsService.update(id, updateRentalDto, fileUrl);
   }
 }
+
 
 
 

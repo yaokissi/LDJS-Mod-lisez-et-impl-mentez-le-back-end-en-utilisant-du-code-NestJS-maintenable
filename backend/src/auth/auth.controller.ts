@@ -3,16 +3,19 @@ import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
    * Endpoint POST /api/auth/register
-   * Le décorateur @Body permet de récupérer le corps de la requête HTTP
-   * et de le valider automatiquement via le RegisterDto.
    */
+  @ApiOperation({ summary: "Créer un nouveau compte utilisateur" })
+  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès, retourne un token JWT.' })
+  @ApiResponse({ status: 400, description: "Données invalides ou adresse email déjà existante." })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -20,9 +23,10 @@ export class AuthController {
 
   /**
    * Endpoint POST /api/auth/login
-   * Le décorateur @Body permet de récupérer le corps de la requête HTTP
-   * et de le valider automatiquement via le LoginDto.
    */
+  @ApiOperation({ summary: "Connecter un utilisateur existant" })
+  @ApiResponse({ status: 200, description: 'Connexion réussie, retourne un token JWT.' })
+  @ApiResponse({ status: 401, description: "Identifiants invalides." })
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -30,14 +34,17 @@ export class AuthController {
 
   /**
    * Endpoint GET /api/auth/me
-   * Le décorateur @UseGuards(JwtAuthGuard) protège cet endpoint.
-   * Si le token est valide, Passport injecte l'utilisateur décodé dans `req.user`.
    */
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: "Récupérer le profil de l'utilisateur connecté" })
+  @ApiResponse({ status: 200, description: 'Retourne les informations du profil connecté (sans le mot de passe).' })
+  @ApiResponse({ status: 401, description: "Token JWT manquant, expiré ou invalide." })
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req) {
     return req.user;
   }
 }
+
 
 
