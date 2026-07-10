@@ -33,7 +33,7 @@ JWT_SECRET="votre_cle_secrete_ultra_securisee"
   ```bash
   npm run start:dev
   ```
-  Le serveur démarre sur **[http://localhost:3001/api](http://localhost:3001/api)**.
+  Le serveur démarre sur **http://localhost:3001/api**.
 
 * **Build et Lancement en production** :
   ```bash
@@ -76,7 +76,7 @@ npx prisma generate
 
 L'API est entièrement documentée à l'aide de Swagger (OpenAPI 3).
 
-* **URL du Swagger** : **[http://localhost:3001/api/swagger](http://localhost:3001/api/swagger)**
+* **URL du Swagger** : **http://localhost:3001/api/swagger**
 
 ### Comment tester les routes sécurisées dans Swagger ?
 1. Cliquez sur l'endpoint `/api/auth/login` (ou `/api/auth/register`) pour vous connecter/inscrire.
